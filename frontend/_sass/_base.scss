@@ -9,7 +9,40 @@ body {
 }
 
 .container { max-width: $max-width; margin: 0 auto; padding: 0 16px; }
-main.container { padding-top: 2rem; padding-bottom: 3rem; }
+.page { padding-top: 2rem; padding-bottom: 3rem; }
+.page-main { min-width: 0; }
+
+/* Wide screens: notes on the left, ad slot on the right. */
+@media (min-width: 960px) {
+  .container.page.with-aside {
+    max-width: $page-width;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) $aside-width;
+    gap: 2rem;
+    align-items: start;
+  }
+  .page-aside { position: sticky; top: 1.5rem; }
+}
+/* Narrow screens: the ad slot drops below the content. */
+@media (max-width: 959px) {
+  .page-aside { margin-top: 1.5rem; }
+}
+
+.ad-card {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 1rem 1.25rem 1.25rem;
+  h3 { margin: 0.4rem 0 0.4rem; font-size: 1.05rem; }
+  p { margin: 0 0 0.9rem; color: $muted; font-size: 0.92rem; }
+}
+.ad-label { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: $muted; }
+.ad-button {
+  display: inline-block; background: $accent; color: #fff; text-decoration: none;
+  padding: 0.5rem 0.9rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+  &:hover { filter: brightness(1.1); }
+}
+#sidebar-ad-elfsight:empty { display: none; }
 
 a { color: $accent; }
 

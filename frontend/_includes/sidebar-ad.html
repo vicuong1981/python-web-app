@@ -1,0 +1,14 @@
+<!-- Right-hand ad slot, controlled by the sidebar-ad feature flag (see assets/js/app.js):
+     "off" hides it, "house" shows the built-in banner below, and an Elfsight widget ID
+     shows that Elfsight banner instead. -->
+<aside id="sidebar-ad" class="page-aside" aria-label="Sponsored" hidden>
+  <div class="ad-card">
+    <span class="ad-label">Sponsored</span>
+    <div id="sidebar-ad-house" hidden>
+      <h3>{{ site.house_ad.title }}</h3>
+      <p>{{ site.house_ad.text }}</p>
+      <a class="ad-button" href="{{ site.house_ad.url }}" target="_blank" rel="noopener sponsored">{{ site.house_ad.cta }}</a>
+    </div>
+    <div id="sidebar-ad-elfsight"></div>
+  </div>
+</aside>

@@ -56,10 +56,33 @@
     };
   }
 
+  // Right-hand ad slot, from the sidebar-ad flag: "off" (or missing) hides it,
+  // "house" shows the built-in banner, an Elfsight widget ID loads that widget.
+  function showSidebarAd(value) {
+    const aside = $("sidebar-ad");
+    if (!aside || !value || value === "off") return;
+    if (value === "house") {
+      $("sidebar-ad-house").hidden = false;
+    } else {
+      const slot = $("sidebar-ad-elfsight");
+      const widget = document.createElement("div");
+      widget.className = `elfsight-app-${value}`;
+      widget.setAttribute("data-elfsight-app-lazy", "");
+      slot.replaceChildren(widget);
+      const script = document.createElement("script");
+      script.src = "https://elfsightcdn.com/platform.js";
+      script.async = true;
+      document.body.append(script);
+    }
+    aside.hidden = false;
+    aside.closest(".page")?.classList.add("with-aside");
+  }
+
   async function loadFlags() {
     try {
       const { flags } = await (await api("/api/flags")).json();
       showBanner(flags["site-banner"]);
+      showSidebarAd(flags["sidebar-ad"]);
       state.maxLength = flags["max-note-length"];
       if (flags["new-homepage"] && $("hero")) {
         $("hero").hidden = false;

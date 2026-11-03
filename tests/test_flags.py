@@ -68,3 +68,23 @@ def test_site_banner_off_values_hide_it():
 def test_site_banner_is_capped():
     set_flags(site_banner="x" * 1000)
     assert len(client.get("/api/flags").json()["flags"]["site-banner"]) == flags.BANNER_MAX_LEN
+
+
+def test_sidebar_ad_defaults_to_house_banner():
+    assert client.get("/api/flags").json()["flags"]["sidebar-ad"] == "house"
+
+
+def test_sidebar_ad_values():
+    cases = {
+        "off": "off",
+        "": "off",
+        "House": "house",
+        "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+        # Pasted straight from Elfsight's embed code
+        "elfsight-app-1a2b3c4d-5e6f": "1a2b3c4d-5e6f",
+        # Anything that isn't a plain ID can't be injected into the page
+        '"><script>alert(1)</script>': "house",
+    }
+    for value, expected in cases.items():
+        set_flags(sidebar_ad=value)
+        assert client.get("/api/flags").json()["flags"]["sidebar-ad"] == expected, value
