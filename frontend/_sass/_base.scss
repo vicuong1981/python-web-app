@@ -14,8 +14,9 @@ body {
 
 /* Wide screens: notes on the left, ad slot on the right. */
 @media (min-width: 960px) {
-  .container.page.with-aside {
-    max-width: $page-width;
+  /* Header, notice banner, page and footer share one width so they line up. */
+  body.with-aside .container { max-width: $page-width; }
+  body.with-aside .container.page {
     display: grid;
     grid-template-columns: minmax(0, 1fr) $aside-width;
     gap: 2rem;
