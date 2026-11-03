@@ -84,6 +84,7 @@ Flags are evaluated by [Cloudflare Flagship](https://developers.cloudflare.com/f
 | `new-homepage` | boolean | off | Shows the redesigned homepage. Created with a 25% rollout, sticky per user. |
 | `notes-api` | boolean | on | Kill switch: when off, the notes API returns `503`. |
 | `max-note-length` | number | 500 | Max characters per note; 2000 for users on the `pro` plan. |
+| `site-banner` | string | `off` | Text shown in a banner at the top of every page. `off`, `none` or empty hides it; up to 300 characters. Visitors can dismiss a message, and a new message shows again. |
 
 Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, which Flagship uses for targeting and rollouts. `GET /api/flags` shows the values the current caller gets.
 

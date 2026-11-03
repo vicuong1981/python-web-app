@@ -18,12 +18,18 @@ log = logging.getLogger(__name__)
 NEW_HOMEPAGE = "new-homepage"  # boolean: show the redesigned homepage
 NOTES_API = "notes-api"  # boolean: kill switch for the notes API
 MAX_NOTE_LENGTH = "max-note-length"  # number: max characters per note
+SITE_BANNER = "site-banner"  # string: notice shown at the top of every page ("" = none)
+
+# Banner values that mean "no banner", so a variant can be named off/none.
+BANNER_OFF_VALUES = {"", "off", "none", "false"}
+BANNER_MAX_LEN = 300
 
 # Safe defaults, used if Flagship is unreachable or not configured.
 DEFAULTS = {
     NEW_HOMEPAGE: False,
     NOTES_API: True,
     MAX_NOTE_LENGTH: 500,
+    SITE_BANNER: "",
 }
 
 
@@ -65,10 +71,23 @@ def number(key: str, ctx: EvaluationContext) -> int:
     return api.get_client().get_integer_value(key, DEFAULTS[key], ctx)
 
 
+def text(key: str, ctx: EvaluationContext) -> str:
+    return api.get_client().get_string_value(key, DEFAULTS[key], ctx)
+
+
+def banner(ctx: EvaluationContext) -> str:
+    """The site banner text, trimmed; "" when there's no banner to show."""
+    value = text(SITE_BANNER, ctx).strip()
+    if value.lower() in BANNER_OFF_VALUES:
+        return ""
+    return value[:BANNER_MAX_LEN]
+
+
 def snapshot(ctx: EvaluationContext) -> dict:
     """Current value of every flag for this user - handy for debugging."""
     return {
         NEW_HOMEPAGE: is_on(NEW_HOMEPAGE, ctx),
         NOTES_API: is_on(NOTES_API, ctx),
         MAX_NOTE_LENGTH: number(MAX_NOTE_LENGTH, ctx),
+        SITE_BANNER: banner(ctx),
     }

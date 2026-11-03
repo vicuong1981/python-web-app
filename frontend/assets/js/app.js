@@ -40,9 +40,26 @@
   }
 
   // ---------- flags & status ----------
+  // Banner text comes from the site-banner flag. Dismissing hides that exact
+  // text in this browser; a new message shows up again.
+  function showBanner(text) {
+    const banner = $("site-banner");
+    if (!banner || !text) return;
+    let dismissed = null;
+    try { dismissed = localStorage.getItem("dismissedBanner"); } catch (_) { /* ignore */ }
+    if (dismissed === text) return;
+    $("site-banner-text").textContent = text;
+    banner.hidden = false;
+    $("site-banner-close").onclick = () => {
+      banner.hidden = true;
+      try { localStorage.setItem("dismissedBanner", text); } catch (_) { /* ignore */ }
+    };
+  }
+
   async function loadFlags() {
     try {
       const { flags } = await (await api("/api/flags")).json();
+      showBanner(flags["site-banner"]);
       state.maxLength = flags["max-note-length"];
       if (flags["new-homepage"] && $("hero")) {
         $("hero").hidden = false;

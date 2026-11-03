@@ -35,6 +35,12 @@ $WRANGLER flagship flags create "$APP_ID" max-note-length \
   --description "Maximum characters per note" \
   --rule "serve=pro; when=plan equals pro"
 
+# Site banner: text shown at the top of every page. "off" (the default) hides it;
+# edit the "notice" variant's text and make it the default to show a message.
+$WRANGLER flagship flags create "$APP_ID" site-banner \
+  -V hidden=off -V "notice=Welcome to My Notes Application!" --default hidden --type string \
+  --description "Editable notice shown at the top of every page"
+
 cat <<EOF
 
 Done. To use these flags, set these environment variables for the app:
