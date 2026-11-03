@@ -22,6 +22,17 @@ a { color: $accent; }
   nav a[aria-current="page"] { color: $accent; font-weight: 600; }
 }
 
+.site-banner {
+  background: #fef3c7;
+  border-bottom: 1px solid #fcd34d;
+  color: #78350f;
+  font-size: 0.95rem;
+  .banner-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.6rem 16px; }
+  #site-banner-text { white-space: pre-wrap; word-break: break-word; }
+  .banner-close { background: none; color: inherit; font-size: 1.25rem; line-height: 1; padding: 0 0.25rem; opacity: 0.7; }
+  .banner-close:hover { opacity: 1; filter: none; }
+}
+
 .site-footer { border-top: 1px solid $border; color: $muted; font-size: 0.875rem; padding: 1.25rem 0; }
 
 .lead { color: $muted; font-size: 1.1rem; }

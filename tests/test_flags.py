@@ -52,3 +52,19 @@ def test_max_note_length_flag():
 def test_user_headers_become_context():
     r = client.get("/api/flags", headers={"X-User-Id": "user-42"})
     assert r.json()["user"] == "user-42"
+
+
+def test_site_banner_text():
+    set_flags(site_banner="  Maintenance tonight at 10pm  ")
+    assert client.get("/api/flags").json()["flags"]["site-banner"] == "Maintenance tonight at 10pm"
+
+
+def test_site_banner_off_values_hide_it():
+    for value in ("", "off", "None", "false"):
+        set_flags(site_banner=value)
+        assert client.get("/api/flags").json()["flags"]["site-banner"] == ""
+
+
+def test_site_banner_is_capped():
+    set_flags(site_banner="x" * 1000)
+    assert len(client.get("/api/flags").json()["flags"]["site-banner"]) == flags.BANNER_MAX_LEN
