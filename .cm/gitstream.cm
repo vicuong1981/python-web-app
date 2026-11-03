@@ -1,0 +1,79 @@
+# -*- mode: yaml -*-
+# gitStream rules for this repo. Docs: https://docs.gitstream.cm
+manifest:
+  version: 1.0
+
+automations:
+  # LinearB AI code review on every non-bot PR
+  linearb_ai_codereview:
+    on: [pr_created, pr_ready_for_review, merge]
+    if:
+      - {{ not is.bot }}
+    run:
+      - action: code-review@v1
+        args:
+          guidelines: |
+            - Keep suggestions short and actionable.
+            - This is a FastAPI app: flag missing input validation, blocking calls in async code and endpoints without tests.
+
+  # AI-written PR description + estimated review time label
+  describe_and_estimate:
+    on: [pr_created, commit]
+    if:
+      - {{ not pr.draft }}
+      - {{ not is.bot }}
+    run:
+      - action: describe-changes@v1
+        args:
+          concat_mode: append
+      - action: add-label@v1
+        args:
+          label: "{{ calc.etr }} min review"
+          color: {{ colors.red if (calc.etr >= 20) else (colors.yellow if (calc.etr >= 5) else colors.green) }}
+
+  # Nudge when app code changes without a matching test change
+  missing_tests:
+    if:
+      - {{ files | match(regex=r/^app\//) | some }}
+      - {{ not (files | match(regex=r/^tests\//) | some) }}
+    run:
+      - action: add-label@v1
+        args:
+          label: "missing-tests"
+          color: {{ colors.yellow }}
+      - action: add-comment@v1
+        args:
+          comment: |
+            This PR changes code in `app/` but no tests in `tests/`. Consider adding or updating a test.
+
+  # Flag changes to the delivery pipeline so they get a careful look
+  pipeline_change:
+    if:
+      - {{ files | match(regex=r/^(\.github\/workflows\/|Dockerfile|docker-compose\.yml)/) | some }}
+    run:
+      - action: add-label@v1
+        args:
+          label: "ci-cd-change"
+          color: {{ colors.red }}
+
+  # Docs-only PRs are low risk
+  docs_only:
+    if:
+      - {{ files | allDocs }}
+    run:
+      - action: add-label@v1
+        args:
+          label: "docs-only"
+          color: {{ colors.green }}
+
+# ----------------- config -----------------
+calc:
+  etr: {{ branch | estimatedReviewTime }}
+
+is:
+  bot: {{ pr.author | match(list=['github-actions','_bot_','[bot]','dependabot','gitstream-cm']) | some }}
+
+colors:
+  red:    'b60205'
+  yellow: 'fbca04'
+  green:  '0e8a16'
