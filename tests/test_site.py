@@ -33,3 +33,11 @@ def test_fallback_when_site_not_built(monkeypatch, tmp_path):
     client = make_client(monkeypatch, tmp_path / "missing")
     r = client.get("/")
     assert r.status_code == 200 and "hasn't been built" in r.text
+
+
+def test_site_files_are_revalidated(monkeypatch, tmp_path):
+    (tmp_path / "index.html").write_text("<h1>Home</h1>")
+    (tmp_path / "app.js").write_text("console.log(1)")
+    client = make_client(monkeypatch, tmp_path)
+    for path in ("/", "/app.js"):
+        assert client.get(path).headers["cache-control"] == "no-cache"
