@@ -85,6 +85,7 @@ Flags are evaluated by [Cloudflare Flagship](https://developers.cloudflare.com/f
 | `notes-api` | boolean | on | Kill switch: when off, the notes API returns `503`. |
 | `max-note-length` | number | 500 | Max characters per note; 2000 for users on the `pro` plan. |
 | `site-banner` | string | `off` | Text shown in a banner at the top of every page. `off`, `none` or empty hides it; up to 300 characters. Visitors can dismiss a message, and a new message shows again. |
+| `sidebar-ad` | string | `house` | Ad slot on the right of the page (below the content on phones). `off` hides it, `house` shows the built-in banner (text and link in `frontend/_config.yml` under `house_ad`), and an [Elfsight](https://elfsight.com/banner-widget/) widget ID shows that Elfsight banner. |
 
 Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, which Flagship uses for targeting and rollouts. `GET /api/flags` shows the values the current caller gets.
 

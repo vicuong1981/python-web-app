@@ -41,6 +41,12 @@ $WRANGLER flagship flags create "$APP_ID" site-banner \
   -V hidden=off -V "notice=Welcome to My Notes Application!" --default hidden --type string \
   --description "Editable notice shown at the top of every page"
 
+# Right-hand ad slot: "house" = built-in banner, "off" = hidden. To use Elfsight,
+# add a variant whose value is your Elfsight widget ID and make it the default.
+$WRANGLER flagship flags create "$APP_ID" sidebar-ad \
+  -V house=house -V hidden=off --default house --type string \
+  --description "Right-hand ad slot: house, off, or an Elfsight widget ID"
+
 cat <<EOF
 
 Done. To use these flags, set these environment variables for the app:

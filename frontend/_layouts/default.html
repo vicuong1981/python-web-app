@@ -9,9 +9,12 @@
 </head>
 <body>
   {% include header.html %}
-  <main class="container">
-    {{ content }}
-  </main>
+  <div class="container page">
+    <main class="page-main">
+      {{ content }}
+    </main>
+    {% include sidebar-ad.html %}
+  </div>
   {% include footer.html %}
   <script src="{{ '/assets/js/app.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
 </body>

@@ -8,6 +8,7 @@ so the app always runs.
 
 import logging
 import os
+import re
 
 from openfeature import api
 from openfeature.evaluation_context import EvaluationContext
@@ -20,6 +21,8 @@ NOTES_API = "notes-api"  # boolean: kill switch for the notes API
 MAX_NOTE_LENGTH = "max-note-length"  # number: max characters per note
 SITE_BANNER = "site-banner"  # string: notice shown at the top of every page ("" = none)
 
+SIDEBAR_AD = "sidebar-ad"  # string: "off", "house" (built-in banner) or an Elfsight widget ID
+
 # Banner values that mean "no banner", so a variant can be named off/none.
 BANNER_OFF_VALUES = {"", "off", "none", "false"}
 BANNER_MAX_LEN = 300
@@ -30,7 +33,11 @@ DEFAULTS = {
     NOTES_API: True,
     MAX_NOTE_LENGTH: 500,
     SITE_BANNER: "",
+    SIDEBAR_AD: "house",
 }
+
+# An Elfsight widget ID: letters, digits and dashes (it goes into a CSS class name).
+_ELFSIGHT_ID = re.compile(r"^[A-Za-z0-9-]{6,64}$")
 
 
 def init_flags() -> str:
@@ -83,6 +90,18 @@ def banner(ctx: EvaluationContext) -> str:
     return value[:BANNER_MAX_LEN]
 
 
+def sidebar_ad(ctx: EvaluationContext) -> str:
+    """'off', 'house', or a validated Elfsight widget ID. Anything else falls back to 'house'."""
+    value = text(SIDEBAR_AD, ctx).strip()
+    if value.lower() in BANNER_OFF_VALUES:
+        return "off"
+    if value.lower() == "house":
+        return "house"
+    # Accept a bare ID, or "elfsight-app-<id>" copied straight from the embed code.
+    value = value.removeprefix("elfsight-app-")
+    return value if _ELFSIGHT_ID.match(value) else "house"
+
+
 def snapshot(ctx: EvaluationContext) -> dict:
     """Current value of every flag for this user - handy for debugging."""
     return {
@@ -90,4 +109,5 @@ def snapshot(ctx: EvaluationContext) -> dict:
         NOTES_API: is_on(NOTES_API, ctx),
         MAX_NOTE_LENGTH: number(MAX_NOTE_LENGTH, ctx),
         SITE_BANNER: banner(ctx),
+        SIDEBAR_AD: sidebar_ad(ctx),
     }
