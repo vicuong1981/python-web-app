@@ -1,0 +1,17 @@
+# Read by the GitHub for Jira app: maps GitHub environment names to Jira's
+# environment types so deployments show under the right environment.
+# Once this file exists Jira stops guessing, so list every environment used.
+deployments:
+  environmentMapping:
+    development:
+      - "dev*"
+      - "local"
+    testing:
+      - "test*"
+      - "qa*"
+    staging:
+      - "stag*"
+      - "preview*"
+    production:
+      - "production"
+      - "prod*"
