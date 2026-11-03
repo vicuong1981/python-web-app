@@ -131,11 +131,17 @@ jobs:
           cache-from: type=gha
 
   linearb-deployment:
-    name: Report deployment to LinearB
+    name: Deploy to production (report to LinearB & Jira)
     needs: docker
-    # Every image published from main counts as a deployment for DORA metrics
+    # Every image published from main counts as a production deployment:
+    # - LinearB gets it through its Deployment API (DORA metrics)
+    # - The "environment" below makes GitHub record a deployment with a status,
+    #   which the GitHub for Jira app shows on the linked Jira work items
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://python-web-app-nf5g.onrender.com
     steps:
       - name: POST deployment to LinearB API
         env:

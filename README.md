@@ -143,3 +143,11 @@ FastAPI serves the built site from `frontend/_site` (override with `SITE_DIR`).
 3. Add the values in Render under **python-web-app → Environment** (or in `.env` locally). Render redeploys automatically.
 
 To check Sentry, set `ENABLE_DEBUG_ENDPOINTS=true`, open `/api/debug/error` once, then set it back to `false`. The error appears in Sentry within a minute. Traces appear in Grafana under **Explore → Tempo**, filtered by service `python-web-app`.
+
+## Jira
+
+The repo is linked to Jira (`vicuong.atlassian.net`) through the GitHub for Jira app. Put a work item key, such as `KAN-1`, in a branch name, commit message or pull request title, and Jira shows that work on the item:
+
+- **Development panel:** branches, commits and pull requests.
+- **Builds:** the GitHub Actions runs for those commits, with pass or fail.
+- **Deployments:** each release from `main` is recorded as a deployment to the `production` GitHub environment (the last job in `ci.yml`), and appears in Jira under **Production** (`.jira/config.yml` maps the names). A deployment covers every work item key in the commits since the last successful deployment.
