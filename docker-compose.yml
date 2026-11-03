@@ -3,7 +3,7 @@ services:
     build: .
     ports:
       - "8000:8000"
-    # Flagship settings; copy .env.example to .env and fill it in
+    # Flagship token: copy .env.example to .env and add FLAGSHIP_API_TOKEN
     env_file:
       - path: .env
         required: false

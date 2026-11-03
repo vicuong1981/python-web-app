@@ -71,11 +71,15 @@ Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, whic
 
 **Set up**
 
-1. Create the app and flags in Cloudflare: `npx wrangler login`, then `./scripts/create_flags.sh` (prints the app ID).
-2. Create a Cloudflare API token with the **Flagship Evaluate** permission.
-3. Set `FLAGSHIP_APP_ID`, `CLOUDFLARE_ACCOUNT_ID` and `FLAGSHIP_API_TOKEN` (see `.env.example`). With Docker Compose, copy `.env.example` to `.env`; with `docker run`, pass them with `-e`.
+The flags already exist in Cloudflare (Flagship app `python-web-app`), and the Docker image has the app ID and account ID built in. The only thing to supply is the API token:
 
-Without these variables, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
+1. In Cloudflare, create an account API token with the **Flagship Evaluate** permission.
+2. **Running the app:** with Docker Compose, copy `.env.example` to `.env` and set `FLAGSHIP_API_TOKEN`; with `docker run`, pass `-e FLAGSHIP_API_TOKEN=...`.
+3. **CI:** add the same token as a repository secret named `FLAGSHIP_API_TOKEN`. The pipeline then checks that the built container gets live values from Flagship.
+
+To recreate the flags in another Cloudflare account, use `./scripts/create_flags.sh` and override `FLAGSHIP_APP_ID` and `CLOUDFLARE_ACCOUNT_ID`.
+
+Without the token, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
 
 ## Frontend (Jekyll)
 
