@@ -1,6 +1,19 @@
-# Python Web App (FastAPI + Docker + GitHub Actions)
+# My Notes Application (FastAPI + Jekyll + Docker + GitHub Actions)
 
 A small FastAPI web app with a homepage, health check and a notes API, packaged as a Docker image and built by GitHub Actions.
+
+
+## Features
+
+- **Notes** with a live character limit (set by the `max-note-length` flag)
+- **Tags:** add comma-separated tags to a note (`work, ideas`); click a tag to filter by it
+- **Categories:** create and delete categories, and put each note in one; deleting a category keeps its notes
+- **Search and filters:** by text, category and tag, in any combination
+- **Edit** any note in place
+- **Multi-select:** tick notes (or *Select all*) to add or remove tags, move them to a category, share them or delete them in one go
+- **Share by email:** opens your email app with the selected notes filled in (subject, text, category and tags), or copies the text; no mail server needed
+
+> Notes and categories are kept in memory, so they reset when the app restarts. On Render's free tier that happens after about 15 minutes without visitors.
 
 ## Endpoints
 
@@ -8,8 +21,13 @@ A small FastAPI web app with a homepage, health check and a notes API, packaged 
 |---|---|
 | `/` | Homepage |
 | `/health` | Health check (used by Docker and CI) |
-| `/api/notes` | `GET` list / `POST {"text": "..."}` create |
+| `/api/notes` | `GET` list (filters: `tag`, `category_id`, `q`) / `POST {"text": "...", "tags": [...], "category_id": 1}` create |
 | `/api/notes/{id}` | `GET` one / `DELETE` one |
+| `/api/notes/{id}` (`PATCH`) | Edit text, tags or category |
+| `/api/notes/bulk` | Bulk `delete`, `add_tags`, `remove_tags` or `set_category` |
+| `/api/notes/share` | Build an email (subject, body, `mailto:` link) for chosen notes |
+| `/api/categories` | `GET` list / `POST {"name": "..."}` create; `DELETE /api/categories/{id}` |
+| `/api/tags` | Tags in use, with counts |
 | `/docs` | Interactive API docs |
 
 ## Run with Docker

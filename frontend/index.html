@@ -18,17 +18,82 @@ title: Notes
   <form id="note-form">
     <label for="note-text">Note</label>
     <textarea id="note-text" rows="3" required placeholder="Write something…"></textarea>
+    <div class="field-row">
+      <div>
+        <label for="note-tags">Tags</label>
+        <input id="note-tags" type="text" placeholder="e.g. work, ideas" autocomplete="off" list="tag-suggestions">
+        <p class="hint">Separate tags with commas.</p>
+      </div>
+      <div>
+        <label for="note-category">Category</label>
+        <select id="note-category" class="category-select"></select>
+      </div>
+    </div>
     <div class="form-row">
       <span id="char-count" class="muted"></span>
       <button type="submit">Save note</button>
     </div>
     <p id="form-error" class="error" role="alert" hidden></p>
   </form>
+  <datalist id="tag-suggestions"></datalist>
 </section>
 
 <section class="card">
-  <h2>Your notes</h2>
+  <div class="card-head">
+    <h2>Categories</h2>
+  </div>
+  <div id="category-list" class="chips"></div>
+  <form id="category-form" class="inline-form">
+    <label for="category-name" class="visually-hidden">New category</label>
+    <input id="category-name" type="text" maxlength="40" placeholder="New category, e.g. Work" required>
+    <button type="submit" class="secondary">Add category</button>
+  </form>
+  <p id="category-error" class="error" role="alert" hidden></p>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>Your notes</h2>
+    <span id="notes-count" class="muted"></span>
+  </div>
+
+  <div class="filters">
+    <input id="search" type="search" placeholder="Search notes…" aria-label="Search notes">
+    <select id="filter-category" class="category-select" aria-label="Filter by category" data-all="All categories"></select>
+    <div id="tag-filters" class="chips" aria-label="Filter by tag"></div>
+  </div>
+
+  <!-- Bulk actions for the notes you tick -->
+  <div id="bulk-bar" class="bulk-bar" hidden>
+    <label class="check"><input type="checkbox" id="select-all"> <span id="selected-count">0 selected</span></label>
+    <div class="bulk-actions">
+      <button type="button" class="secondary" data-bulk="add_tags">Add tag</button>
+      <button type="button" class="secondary" data-bulk="remove_tags">Remove tag</button>
+      <select id="bulk-category" class="category-select" aria-label="Move selected notes to category" data-placeholder="Move to category…"></select>
+      <button type="button" class="secondary" data-bulk="share">Share by email</button>
+      <button type="button" class="danger" data-bulk="delete">Delete</button>
+    </div>
+  </div>
+
   <p id="notes-unavailable" class="error" hidden>Notes are temporarily unavailable.</p>
   <ul id="notes" class="notes"></ul>
   <p id="notes-empty" class="muted" hidden>No notes yet.</p>
 </section>
+
+<!-- Share dialog -->
+<dialog id="share-dialog">
+  <form method="dialog" id="share-form">
+    <h2>Share by email</h2>
+    <p id="share-summary" class="muted"></p>
+    <label for="share-to">Send to (optional)</label>
+    <input id="share-to" type="email" placeholder="name@example.com" autocomplete="email">
+    <p class="hint">Opens your email app with the notes filled in, so you can check it before sending.</p>
+    <div class="form-row">
+      <button type="button" class="secondary" id="share-copy">Copy text</button>
+      <span>
+        <button value="cancel" class="secondary">Cancel</button>
+        <button type="button" id="share-send">Open email</button>
+      </span>
+    </div>
+  </form>
+</dialog>

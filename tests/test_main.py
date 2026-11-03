@@ -8,7 +8,7 @@ client = TestClient(app)
 def test_home():
     r = client.get("/")
     assert r.status_code == 200
-    assert "Python Web App" in r.text
+    assert "My Notes Application" in r.text
 
 
 def test_health():

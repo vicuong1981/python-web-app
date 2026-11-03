@@ -48,7 +48,7 @@ a { color: $accent; }
 
 label { display: block; font-weight: 600; margin-bottom: 0.4rem; }
 
-textarea {
+textarea, input[type="text"], input[type="search"], input[type="email"], select {
   width: 100%;
   font: inherit;
   padding: 0.6rem 0.75rem;
@@ -69,17 +69,80 @@ button {
   padding: 0.5rem 1rem;
   cursor: pointer;
   &:hover { filter: brightness(1.1); }
-  &.link { background: none; color: $muted; padding: 0.25rem 0.5rem; }
-  &.link:hover { color: $error; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+  &.secondary { background: $card; color: $text; border: 1px solid $border; }
+  &.secondary:hover { border-color: $accent; filter: none; }
+  &.danger { background: $error; }
+  &.link { background: none; color: $muted; padding: 0.25rem 0.4rem; }
+  &.link:hover { color: $accent; filter: none; }
+  &.danger-link:hover { color: $error; }
+}
+
+select { background: $card; cursor: pointer; }
+.hint { color: $muted; font-size: 0.8rem; margin: 0.3rem 0 0; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.field-row { display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+.inline-form { display: flex; gap: 0.5rem; margin-top: 0.75rem; button { white-space: nowrap; } }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; h2 { margin-bottom: 0.75rem; } }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.85rem; line-height: 1.2;
+  padding: 0.3rem 0.65rem; border-radius: 999px;
+  border: 1px solid $border; background: $bg; color: $text;
+  small { color: $muted; }
+  &.small { font-size: 0.75rem; padding: 0.15rem 0.5rem; }
+  &.category { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+  &.tag { cursor: pointer; }
+  &.tag:hover, &.tag.active { background: $accent; border-color: $accent; color: #fff; }
+}
+button.chip { font: inherit; font-size: 0.85rem; }
+button.chip.small { font-size: 0.75rem; }
+.chip-x { background: none; color: inherit; padding: 0 0.15rem; font-size: 1rem; line-height: 1; opacity: 0.6; &:hover { opacity: 1; filter: none; } }
+
+.filters {
+  display: grid; grid-template-columns: 2fr 1fr; gap: 0.6rem; margin-bottom: 0.9rem;
+  #tag-filters { grid-column: 1 / -1; }
+}
+
+.bulk-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem;
+  padding: 0.6rem 0.75rem; margin-bottom: 0.5rem;
+  background: $bg; border: 1px solid $border; border-radius: 8px;
+  .bulk-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+  button, select { font-size: 0.85rem; padding: 0.35rem 0.7rem; width: auto; }
+}
+.check { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; margin: 0; cursor: pointer; }
+
+dialog {
+  border: 1px solid $border; border-radius: $radius; padding: 1.5rem;
+  width: 440px; max-width: calc(100vw - 32px);
+  h2 { margin-top: 0; font-size: 1.15rem; }
+  &::backdrop { background: rgba(15, 23, 42, 0.45); }
+}
+
+@media (max-width: 560px) {
+  .field-row, .filters { grid-template-columns: 1fr; }
 }
 
 .notes {
   list-style: none;
   padding: 0;
   margin: 0;
-  li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; border-top: 1px solid $border; }
+  li {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 0.75rem; align-items: start;
+    padding: 0.75rem 0.5rem; border-top: 1px solid $border; border-radius: 6px;
+    &.selected { background: #f5f3ff; }
+    > input[type="checkbox"] { margin-top: 0.3rem; }
+  }
   li:first-child { border-top: 0; }
-  .note-text { white-space: pre-wrap; word-break: break-word; }
+  .note-text { white-space: pre-wrap; word-break: break-word; margin: 0; }
+  .note-meta { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+  .note-actions { display: flex; gap: 0.1rem; }
+  .edit-form .field-row { grid-template-columns: 2fr 1fr; margin-top: 0.5rem; }
+  @media (max-width: 560px) { li { grid-template-columns: auto 1fr; } .note-actions { grid-column: 2; } }
 }
 
 table { border-collapse: collapse; width: 100%; }
