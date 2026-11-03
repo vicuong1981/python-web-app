@@ -55,3 +55,4 @@ This repo is wired up for [LinearB](https://linearb.io):
 - **Git metrics** (PRs, cycle time, coding/pickup/review time) come from connecting this repo in LinearB's GitHub integration – no files needed.
 
 > Tip: run `pytest -q` before opening a pull request.
+> Tip: `docker compose up --build` runs the app locally in Docker.
