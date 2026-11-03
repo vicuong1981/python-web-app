@@ -75,7 +75,8 @@
       document.body.append(script);
     }
     aside.hidden = false;
-    aside.closest(".page")?.classList.add("with-aside");
+    // Widen the whole page (header, banner, content, footer) together.
+    document.body.classList.add("with-aside");
   }
 
   async function loadFlags() {
