@@ -27,9 +27,29 @@ jobs:
       - run: ruff check .
       - run: pytest -q
 
+  frontend:
+    name: Build Jekyll site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: frontend
+      - run: JEKYLL_ENV=production bundle exec jekyll build --strict_front_matter
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: frontend/_site
+          retention-days: 7
+
   docker:
     name: Build, smoke-test & push image
-    needs: test
+    needs: [test, frontend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -60,14 +80,37 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Smoke-test the container
+        env:
+          FLAGSHIP_API_TOKEN: ${{ secrets.FLAGSHIP_API_TOKEN }}
         run: |
-          docker run -d --name app -p 8000:8000 app:ci
+          docker run -d --name app -p 8000:8000 -e FLAGSHIP_API_TOKEN app:ci
           for i in $(seq 1 20); do
-            curl -fs http://localhost:8000/health && exit 0
+            curl -fs http://localhost:8000/health && break
+            if [ "$i" = 20 ]; then docker logs app; exit 1; fi
             sleep 1
           done
-          docker logs app
-          exit 1
+          echo; echo "Checking the Jekyll frontend is served..."
+          curl -fs http://localhost:8000/ | grep -q 'id="note-form"'
+          curl -fs http://localhost:8000/about/ | grep -q 'About this app'
+          curl -fs http://localhost:8000/assets/css/main.css | grep -q 'hero'
+          curl -fs http://localhost:8000/assets/js/app.js | grep -q '/api/notes'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/no-such-page)" = 404
+          echo "Frontend OK"
+
+      - name: Check live Cloudflare Flagship flags
+        env:
+          FLAGSHIP_API_TOKEN: ${{ secrets.FLAGSHIP_API_TOKEN }}
+        run: |
+          if [ -z "$FLAGSHIP_API_TOKEN" ]; then
+            echo "::notice::FLAGSHIP_API_TOKEN secret not set - skipping the live Flagship check."
+            exit 0
+          fi
+          curl -fs http://localhost:8000/api/flags -H 'X-User-Id: ci-check' -H 'X-User-Plan: pro' | tee flags.json
+          echo
+          # The default limit is 500; only Flagship's pro-plan rule gives 2000.
+          python3 -c "import json,sys; f=json.load(open('flags.json')); assert f['provider']=='flagship', f; assert f['flags']['max-note-length']==2000, 'Flagship not answering: '+str(f)"
+          echo "Live Flagship flags OK"
+
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'

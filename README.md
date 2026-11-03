@@ -71,8 +71,39 @@ Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, whic
 
 **Set up**
 
-1. Create the app and flags in Cloudflare: `npx wrangler login`, then `./scripts/create_flags.sh` (prints the app ID).
-2. Create a Cloudflare API token with the **Flagship Evaluate** permission.
-3. Set `FLAGSHIP_APP_ID`, `CLOUDFLARE_ACCOUNT_ID` and `FLAGSHIP_API_TOKEN` (see `.env.example`). With Docker Compose, copy `.env.example` to `.env`; with `docker run`, pass them with `-e`.
+The flags already exist in Cloudflare (Flagship app `python-web-app`), and the Docker image has the app ID and account ID built in. The only thing to supply is the API token:
 
-Without these variables, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
+1. In Cloudflare, create an account API token with the **Flagship Evaluate** permission.
+2. **Running the app:** with Docker Compose, copy `.env.example` to `.env` and set `FLAGSHIP_API_TOKEN`; with `docker run`, pass `-e FLAGSHIP_API_TOKEN=...`.
+3. **CI:** add the same token as a repository secret named `FLAGSHIP_API_TOKEN`. The pipeline then checks that the built container gets live values from Flagship.
+
+To recreate the flags in another Cloudflare account, use `./scripts/create_flags.sh` and override `FLAGSHIP_APP_ID` and `CLOUDFLARE_ACCOUNT_ID`.
+
+Without the token, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
+
+## Frontend (Jekyll)
+
+The web pages are a [Jekyll](https://jekyllrb.com/) site in `frontend/`. Jekyll turns the layouts, includes, Markdown and Sass there into static files, which FastAPI serves at `/`; the JSON API stays under `/api`.
+
+| Path | What it is |
+|---|---|
+| `frontend/_config.yml` | Site title, description, version and navigation |
+| `frontend/_layouts/default.html` | Page template shared by every page |
+| `frontend/_includes/` | Header and footer |
+| `frontend/index.html` | Notes page: add, list and delete notes |
+| `frontend/about.md` | About page, written in Markdown |
+| `frontend/_sass/`, `frontend/assets/css/main.scss` | Styles |
+| `frontend/assets/js/app.js` | Calls the API and applies the feature flags (new homepage, note length, notes kill switch) |
+
+The Docker build runs Jekyll automatically, so `docker compose up --build` gives you the full app. To work on the pages locally:
+
+```bash
+cd frontend && bundle install && bundle exec jekyll build --watch   # rebuilds on save
+uvicorn app.main:app --reload                                        # in another terminal
+```
+
+FastAPI serves the built site from `frontend/_site` (override with `SITE_DIR`).
+
+## Public deployment (Render)
+
+`render.yaml` deploys the app to [Render](https://render.com)'s free tier straight from this repo: in Render, choose **New → Blueprint**, pick this repo, and enter your `FLAGSHIP_API_TOKEN` when asked. Render rebuilds and redeploys on every push to `main`. Free services sleep after about 15 minutes without visitors, so the first request after that takes up to a minute.

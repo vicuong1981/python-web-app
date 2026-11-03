@@ -1,0 +1,16 @@
+# Render Blueprint: deploys this app as a free Docker web service.
+# Render > New > Blueprint > pick this repo. Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: python-web-app
+    runtime: docker
+    plan: free
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Cloudflare Flagship token (Flagship Evaluate permission).
+      # sync: false makes Render ask for the value when you create the service.
+      - key: FLAGSHIP_API_TOKEN
+        sync: false
