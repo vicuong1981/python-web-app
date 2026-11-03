@@ -27,9 +27,29 @@ jobs:
       - run: ruff check .
       - run: pytest -q
 
+  frontend:
+    name: Build Jekyll site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: frontend
+      - run: JEKYLL_ENV=production bundle exec jekyll build --strict_front_matter
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: frontend/_site
+          retention-days: 7
+
   docker:
     name: Build, smoke-test & push image
-    needs: test
+    needs: [test, frontend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -63,11 +83,17 @@ jobs:
         run: |
           docker run -d --name app -p 8000:8000 app:ci
           for i in $(seq 1 20); do
-            curl -fs http://localhost:8000/health && exit 0
+            curl -fs http://localhost:8000/health && break
+            if [ "$i" = 20 ]; then docker logs app; exit 1; fi
             sleep 1
           done
-          docker logs app
-          exit 1
+          echo; echo "Checking the Jekyll frontend is served..."
+          curl -fs http://localhost:8000/ | grep -q 'id="note-form"'
+          curl -fs http://localhost:8000/about/ | grep -q 'About this app'
+          curl -fs http://localhost:8000/assets/css/main.css | grep -q 'hero'
+          curl -fs http://localhost:8000/assets/js/app.js | grep -q '/api/notes'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/no-such-page)" = 404
+          echo "Frontend OK"
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'

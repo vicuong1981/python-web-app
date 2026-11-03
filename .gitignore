@@ -4,3 +4,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .env
+frontend/_site/
+frontend/.jekyll-cache/
+frontend/.sass-cache/
+frontend/vendor/
+frontend/Gemfile.lock

@@ -30,14 +30,11 @@ def test_defaults_when_flagship_not_configured():
     assert r.json()["flags"] == flags.DEFAULTS
 
 
-def test_new_homepage_on():
+def test_new_homepage_flag_exposed_to_frontend():
     set_flags(new_homepage=True)
-    assert "new homepage" in client.get("/").text
-
-
-def test_new_homepage_off():
+    assert client.get("/api/flags").json()["flags"]["new-homepage"] is True
     set_flags(new_homepage=False)
-    assert "new homepage" not in client.get("/").text
+    assert client.get("/api/flags").json()["flags"]["new-homepage"] is False
 
 
 def test_notes_kill_switch():

@@ -76,3 +76,26 @@ Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, whic
 3. Set `FLAGSHIP_APP_ID`, `CLOUDFLARE_ACCOUNT_ID` and `FLAGSHIP_API_TOKEN` (see `.env.example`). With Docker Compose, copy `.env.example` to `.env`; with `docker run`, pass them with `-e`.
 
 Without these variables, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
+
+## Frontend (Jekyll)
+
+The web pages are a [Jekyll](https://jekyllrb.com/) site in `frontend/`. Jekyll turns the layouts, includes, Markdown and Sass there into static files, which FastAPI serves at `/`; the JSON API stays under `/api`.
+
+| Path | What it is |
+|---|---|
+| `frontend/_config.yml` | Site title, description, version and navigation |
+| `frontend/_layouts/default.html` | Page template shared by every page |
+| `frontend/_includes/` | Header and footer |
+| `frontend/index.html` | Notes page: add, list and delete notes |
+| `frontend/about.md` | About page, written in Markdown |
+| `frontend/_sass/`, `frontend/assets/css/main.scss` | Styles |
+| `frontend/assets/js/app.js` | Calls the API and applies the feature flags (new homepage, note length, notes kill switch) |
+
+The Docker build runs Jekyll automatically, so `docker compose up --build` gives you the full app. To work on the pages locally:
+
+```bash
+cd frontend && bundle install && bundle exec jekyll build --watch   # rebuilds on save
+uvicorn app.main:app --reload                                        # in another terminal
+```
+
+FastAPI serves the built site from `frontend/_site` (override with `SITE_DIR`).

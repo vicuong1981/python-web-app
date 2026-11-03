@@ -1,3 +1,13 @@
+# ---- frontend stage: build the static site with Jekyll ----
+FROM ruby:3.3-slim AS site
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /site
+COPY frontend/Gemfile ./
+RUN bundle install
+COPY frontend/ ./
+RUN JEKYLL_ENV=production bundle exec jekyll build --destination /site/_site
+
 # ---- build stage: install dependencies into a virtualenv ----
 FROM python:3.12-slim AS builder
 WORKDIR /app
@@ -15,6 +25,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY app ./app
+COPY --from=site /site/_site ./frontend/_site
 RUN useradd --create-home appuser
 USER appuser
 EXPOSE 8000

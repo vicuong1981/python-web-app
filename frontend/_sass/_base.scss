@@ -1,0 +1,87 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: $text;
+  background: $bg;
+  line-height: 1.55;
+}
+
+.container { max-width: $max-width; margin: 0 auto; padding: 0 16px; }
+main.container { padding-top: 2rem; padding-bottom: 3rem; }
+
+a { color: $accent; }
+
+.site-header {
+  background: $card;
+  border-bottom: 1px solid $border;
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 16px; flex-wrap: wrap; }
+  .brand { font-weight: 700; text-decoration: none; color: $text; }
+  nav a { margin-left: 1rem; text-decoration: none; color: $muted; }
+  nav a[aria-current="page"] { color: $accent; font-weight: 600; }
+}
+
+.site-footer { border-top: 1px solid $border; color: $muted; font-size: 0.875rem; padding: 1.25rem 0; }
+
+.lead { color: $muted; font-size: 1.1rem; }
+.muted { color: $muted; font-size: 0.875rem; }
+.error { color: $error; }
+
+.hero {
+  background: linear-gradient(135deg, $accent, $accent-2);
+  color: #fff;
+  padding: 2rem;
+  border-radius: $radius;
+  margin-bottom: 1.5rem;
+  h1 { margin-top: 0; }
+}
+
+.card {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  h2 { margin-top: 0; font-size: 1.15rem; }
+}
+
+label { display: block; font-weight: 600; margin-bottom: 0.4rem; }
+
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid $border;
+  border-radius: 8px;
+  resize: vertical;
+  &:focus { outline: 2px solid $accent; outline-offset: 1px; }
+}
+
+.form-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
+
+button {
+  font: inherit;
+  background: $accent;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  &:hover { filter: brightness(1.1); }
+  &.link { background: none; color: $muted; padding: 0.25rem 0.5rem; }
+  &.link:hover { color: $error; }
+}
+
+.notes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; border-top: 1px solid $border; }
+  li:first-child { border-top: 0; }
+  .note-text { white-space: pre-wrap; word-break: break-word; }
+}
+
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid $border; }
+code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; }

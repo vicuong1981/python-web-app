@@ -1,0 +1,21 @@
+# Jekyll site for the Python Web App frontend.
+# Built to frontend/_site and served by FastAPI (see app/main.py).
+title: Python Web App
+description: A FastAPI notes app, built with Docker and GitHub Actions, with Cloudflare Flagship feature flags.
+version: 0.2.0
+
+nav:
+  - title: Notes
+    url: /
+  - title: About
+    url: /about/
+  - title: API docs
+    url: /docs
+
+sass:
+  style: compressed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

@@ -1,0 +1,34 @@
+---
+layout: default
+title: Notes
+---
+<!-- Shown only when the new-homepage feature flag is on (see assets/js/app.js) -->
+<section id="hero" class="hero" hidden>
+  <h1>Welcome to the new {{ site.title }} ✨</h1>
+  <p>You're seeing the redesigned homepage, switched on by a Cloudflare Flagship feature flag.</p>
+</section>
+
+<section id="classic-intro">
+  <h1>{{ site.title }}</h1>
+  <p class="lead">{{ site.description }}</p>
+</section>
+
+<section class="card">
+  <h2>Add a note</h2>
+  <form id="note-form">
+    <label for="note-text">Note</label>
+    <textarea id="note-text" rows="3" required placeholder="Write something…"></textarea>
+    <div class="form-row">
+      <span id="char-count" class="muted"></span>
+      <button type="submit">Save note</button>
+    </div>
+    <p id="form-error" class="error" role="alert" hidden></p>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Your notes</h2>
+  <p id="notes-unavailable" class="error" hidden>Notes are temporarily unavailable.</p>
+  <ul id="notes" class="notes"></ul>
+  <p id="notes-empty" class="muted" hidden>No notes yet.</p>
+</section>
