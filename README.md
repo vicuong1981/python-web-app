@@ -103,3 +103,7 @@ uvicorn app.main:app --reload                                        # in anothe
 ```
 
 FastAPI serves the built site from `frontend/_site` (override with `SITE_DIR`).
+
+## Public deployment (Render)
+
+`render.yaml` deploys the app to [Render](https://render.com)'s free tier straight from this repo: in Render, choose **New → Blueprint**, pick this repo, and enter your `FLAGSHIP_API_TOKEN` when asked. Render rebuilds and redeploys on every push to `main`. Free services sleep after about 15 minutes without visitors, so the first request after that takes up to a minute.
