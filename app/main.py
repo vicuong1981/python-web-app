@@ -16,9 +16,12 @@ from fastapi.staticfiles import StaticFiles
 from openfeature.evaluation_context import EvaluationContext
 from pydantic import BaseModel, Field
 
-from app import __version__, flags
+from app import __version__, flags, observability
 
+# Sentry must start before the FastAPI app is created so it can hook into it.
+SENTRY_ON = observability.init_sentry()
 app = FastAPI(title="Python Web App", version=__version__)
+OTEL_ON = observability.init_otel(app)
 FLAG_PROVIDER = flags.init_flags()
 
 
@@ -56,7 +59,20 @@ _next_id = 1
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "version": __version__, "flags": FLAG_PROVIDER}
+    return {
+        "status": "ok",
+        "version": __version__,
+        "flags": FLAG_PROVIDER,
+        "observability": {"sentry": SENTRY_ON, "opentelemetry": OTEL_ON},
+    }
+
+
+@app.get("/api/debug/error", include_in_schema=False)
+def debug_error() -> None:
+    """Deliberate crash, to check errors reach Sentry. Off unless enabled."""
+    if os.getenv("ENABLE_DEBUG_ENDPOINTS") != "true":
+        raise HTTPException(status_code=404, detail="Not Found")
+    raise RuntimeError("Test error from python-web-app (this is expected)")
 
 
 @app.get("/api/flags")

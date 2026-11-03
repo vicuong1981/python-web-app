@@ -14,3 +14,14 @@ services:
       # sync: false makes Render ask for the value when you create the service.
       - key: FLAGSHIP_API_TOKEN
         sync: false
+      # Sentry error tracking: your project's DSN.
+      - key: SENTRY_DSN
+        sync: false
+      # OpenTelemetry to Grafana Cloud: copy both from Grafana Cloud's
+      # OpenTelemetry (OTLP) connection page.
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+      - key: OTEL_EXPORTER_OTLP_HEADERS
+        sync: false
+      - key: OTEL_SERVICE_NAME
+        value: python-web-app
