@@ -56,3 +56,23 @@ This repo is wired up for [LinearB](https://linearb.io):
 
 > Tip: run `pytest -q` before opening a pull request.
 > Tip: `docker compose up --build` runs the app locally in Docker.
+
+## Feature flags (Cloudflare Flagship)
+
+Flags are evaluated by [Cloudflare Flagship](https://developers.cloudflare.com/flagship/) through its official Python SDK (`cloudflare-flagship`, built on OpenFeature). Definitions live in `app/flags.py`.
+
+| Flag | Type | Default | What it does |
+|---|---|---|---|
+| `new-homepage` | boolean | off | Shows the redesigned homepage. Created with a 25% rollout, sticky per user. |
+| `notes-api` | boolean | on | Kill switch: when off, the notes API returns `503`. |
+| `max-note-length` | number | 500 | Max characters per note; 2000 for users on the `pro` plan. |
+
+Callers can identify themselves with `X-User-Id` and `X-User-Plan` headers, which Flagship uses for targeting and rollouts. `GET /api/flags` shows the values the current caller gets.
+
+**Set up**
+
+1. Create the app and flags in Cloudflare: `npx wrangler login`, then `./scripts/create_flags.sh` (prints the app ID).
+2. Create a Cloudflare API token with the **Flagship Evaluate** permission.
+3. Set `FLAGSHIP_APP_ID`, `CLOUDFLARE_ACCOUNT_ID` and `FLAGSHIP_API_TOKEN` (see `.env.example`). With Docker Compose, copy `.env.example` to `.env`; with `docker run`, pass them with `-e`.
+
+Without these variables, or if Flagship can't be reached, every flag returns its default and the app keeps working. Change rollouts and toggles in the Cloudflare dashboard, with no redeploy needed.
