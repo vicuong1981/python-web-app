@@ -107,3 +107,20 @@ FastAPI serves the built site from `frontend/_site` (override with `SITE_DIR`).
 ## Public deployment (Render)
 
 `render.yaml` deploys the app to [Render](https://render.com)'s free tier straight from this repo: in Render, choose **New → Blueprint**, pick this repo, and enter your `FLAGSHIP_API_TOKEN` when asked. Render rebuilds and redeploys on every push to `main`. Free services sleep after about 15 minutes without visitors, so the first request after that takes up to a minute.
+
+## Observability (Sentry + OpenTelemetry)
+
+`app/observability.py` adds two free, optional integrations. Each is off until its settings are present, so local runs and tests send nothing. `/health` shows which are on.
+
+| | What you get | Settings |
+|---|---|---|
+| **Sentry** | Every unhandled error with its stack trace and request, plus sampled performance traces | `SENTRY_DSN`; optional `SENTRY_TRACES_SAMPLE_RATE` (default `0.1`) |
+| **OpenTelemetry** | A trace for every request (except `/health`), plus request count and latency metrics, sent over OTLP/HTTP, for example to Grafana Cloud | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS`; optional `OTEL_SERVICE_NAME` |
+
+**Set up**
+
+1. **Sentry:** create a free account at [sentry.io](https://sentry.io), make a **FastAPI** project, and copy its DSN.
+2. **Grafana Cloud:** create a free account at [grafana.com](https://grafana.com), then in your stack open **OpenTelemetry → Configure** and generate a token. Copy the endpoint and the `OTEL_EXPORTER_OTLP_HEADERS` value it shows.
+3. Add the values in Render under **python-web-app → Environment** (or in `.env` locally). Render redeploys automatically.
+
+To check Sentry, set `ENABLE_DEBUG_ENDPOINTS=true`, open `/api/debug/error` once, then set it back to `false`. The error appears in Sentry within a minute. Traces appear in Grafana under **Explore → Tempo**, filtered by service `python-web-app`.
