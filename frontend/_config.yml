@@ -1,8 +1,8 @@
-# Jekyll site for the Python Web App frontend.
+# Jekyll site for the My Notes Application frontend.
 # Built to frontend/_site and served by FastAPI (see app/main.py).
-title: Python Web App
-description: A FastAPI notes app, built with Docker and GitHub Actions, with Cloudflare Flagship feature flags.
-version: 0.2.0
+title: My Notes Application
+description: Capture notes, organise them with tags and categories, and share them by email.
+version: 0.4.0
 
 nav:
   - title: Notes
