@@ -160,7 +160,13 @@ jobs:
             --arg ts   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{repo_url: $repo, ref_name: $ref, timestamp: $ts}')
           echo "Reporting: $body"
-          curl -sS --fail-with-body -X POST "https://public-api.linearb.io/api/v1/deployments" \
+          # A LinearB problem must not mark a working release as failed (GitHub and
+          # Jira show this job's result as the deployment status), so warn instead.
+          if ! out=$(curl -sS --fail-with-body -X POST "https://public-api.linearb.io/api/v1/deployments" \
             -H "Content-Type: application/json" \
             -H "x-api-key: $LINEARB_API_TOKEN" \
-            -d "$body"
+            -d "$body" 2>&1); then
+            echo "::warning::LinearB didn't record this deployment: $out"
+            exit 0
+          fi
+          echo "LinearB recorded the deployment: $out"

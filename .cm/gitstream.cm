@@ -102,6 +102,26 @@ automations:
             Keep secrets in Render's Environment page or GitHub Actions secrets, never in the repo.
             If it's a false alarm (e.g. a test value), add the `not-a-secret` label.
 
+  # 6. Security scan found problems (Bandit or SonarQube Cloud)
+  # The Security workflow posts one comment whose first line is a marker like
+  # <!-- security-summary bandit_high=0 bandit_medium=0 bandit_low=0 sonar_gate=OK -->
+  # Posting or updating it re-runs gitStream (comment_added), which reads it here.
+  guardrail_security_scan:
+    on: [comment_added, commit, pr_created, label_added, label_removed]
+    if:
+      - {{ has.security_problems }}
+      - {{ pr.labels | match(term='security-reviewed') | nope }}
+    run:
+      - action: add-label@v1
+        args:
+          label: "security-issues"
+          color: {{ colors.red }}
+      - action: request-changes@v1
+        args:
+          comment: |
+            **Security scan found problems.** See the *Security scan* comment below for the Bandit findings or the failed SonarQube Cloud quality gate.
+            Fix them, or add the `security-reviewed` label if you've checked they're false positives.
+
   # ==================== Helpers (non-blocking) ====================
 
   # LinearB AI code review on every non-bot PR
@@ -161,6 +181,8 @@ has:
   app_changes: {{ files | match(regex=r/^app\//) | some }}
   test_changes: {{ files | match(regex=r/^tests\//) | some }}
   delivery_changes: {{ files | match(regex=delivery_files) | some }}
+  # Latest security summary comment from the Security workflow (empty if none yet)
+  security_problems: {{ pr.comments | filter(attr='content', regex=r/security-summary/) | filter(attr='content', regex=r/(bandit_(high|medium)=[1-9]|sonar_gate=ERROR|sonar_vulnerabilities=[1-9])/) | some }}
   possible_secret: {{ source.diff.files | matchDiffLines(regex=r/^\+.*((api[_-]?key|secret|token|passw(or)?d|dsn)\s*[:=]\s*["']?[A-Za-z0-9_\-\/+.@:]{16,}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})/, caseSensitive=false) | some }}
 
 is:

@@ -185,3 +185,25 @@ Two layers check every pull request into `main`.
 | Possible secret | An added line looks like a key, token, password or DSN | `not-a-secret` |
 
 To make these block merging, require the **Jira ticket linked** and **gitStream** checks on `main` with a GitHub ruleset, letting Pages CMS bypass it so content edits still save directly.
+
+## Security scans
+
+`.github/workflows/security.yml` runs on every pull request and push to `main`:
+
+| Step | What it does |
+|---|---|
+| **Bandit** | Scans `app/` and `scripts/` for Python security issues. Fails on medium or high severity; findings also appear in GitHub's **Security → Code scanning** tab. |
+| **SonarQube Cloud** | Runs the tests with coverage, then analyses bugs, vulnerabilities, security hotspots, code smells and coverage (Bandit findings are imported too). Skipped until `SONAR_TOKEN` is set. The quality gate is reported but not enforced. |
+| **Report** | Posts one **Security scan** comment on the PR (updated on every push) and sends each number to LinearB's [External Custom Metrics API](https://docs.linearb.io/api-external-custom-metrics/). |
+
+**How gitStream uses it:** the comment's first line is a hidden marker such as `<!-- security-summary bandit_high=0 bandit_medium=0 bandit_low=0 sonar_gate=OK -->`. A new or updated comment re-runs gitStream, and the `guardrail_security_scan` rule requests changes when Bandit finds medium/high issues or the Sonar quality gate fails (override with the `security-reviewed` label).
+
+**LinearB custom metrics** (source `bandit` or `sonarqube`, tied to the repo, commit and PR; tagged with branch and event):
+
+- `security_bandit_high`, `security_bandit_medium`, `security_bandit_low`, `security_bandit_total`
+- On `main`: `security_sonar_quality_gate_passed` (1/0), `security_sonar_bugs`, `security_sonar_vulnerabilities`, `security_sonar_security_hotspots`, `security_sonar_code_smells`, `security_sonar_coverage`
+- On pull requests: the same Sonar metrics for new code, named `security_sonar_new_…`
+
+**Set up SonarQube Cloud (free for public repos):** sign in at [sonarcloud.io](https://sonarcloud.io) with GitHub, import `vicuong1981/python-web-app`, turn off **Automatic Analysis** (Administration → Analysis Method), create a token (My Account → Security) and save it as the `SONAR_TOKEN` repository secret. If your organisation or project key differs from `sonar-project.properties`, set the `SONAR_ORGANIZATION` / `SONAR_PROJECT_KEY` repository variables.
+
+**LinearB metrics** need the `LINEARB_API_TOKEN` repository secret (LinearB → Company Settings → API Tokens). The same token also reports deployments.
