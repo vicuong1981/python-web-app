@@ -229,7 +229,7 @@
       list.append(el("li", { className: state.selected.has(note.id) ? "selected" : "" }, box, body, actions));
     }
     const filtered = state.filter.tag || state.filter.categoryId || state.filter.q;
-    $("notes-empty").textContent = filtered ? "No notes match these filters." : "No notes yet.";
+    $("notes-empty").textContent = filtered ? "No notes match these filters." : ($("notes-empty").dataset.emptyText || "No notes yet.");
     $("notes-empty").hidden = state.notes.length > 0;
     $("notes-count").textContent = state.notes.length ? `${state.notes.length} shown` : "";
     renderBulkBar();

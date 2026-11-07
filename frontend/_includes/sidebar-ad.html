@@ -5,9 +5,9 @@
   <div class="ad-card">
     <span class="ad-label">Sponsored</span>
     <div id="sidebar-ad-house" hidden>
-      <h3>{{ site.house_ad.title }}</h3>
-      <p>{{ site.house_ad.text }}</p>
-      <a class="ad-button" href="{{ site.house_ad.url }}" target="_blank" rel="noopener sponsored">{{ site.house_ad.cta }}</a>
+      <h3>{{ site.data.settings.house_ad.title | escape }}</h3>
+      <p>{{ site.data.settings.house_ad.text | escape }}</p>
+      <a class="ad-button" href="{{ site.data.settings.house_ad.url | escape }}" target="_blank" rel="noopener sponsored">{{ site.data.settings.house_ad.cta | escape }}</a>
     </div>
     <div id="sidebar-ad-elfsight"></div>
   </div>

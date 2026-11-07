@@ -152,3 +152,18 @@ The repo is linked to Jira (`vicuong.atlassian.net`) through the GitHub for Jira
 - **Development panel:** branches, commits and pull requests.
 - **Builds:** the GitHub Actions runs for those commits, with pass or fail.
 - **Deployments:** each release from `main` is recorded as a deployment to the `production` GitHub environment (the last job in `ci.yml`), and appears in Jira under **Production** (`.jira/config.yml` maps the names). A deployment covers every work item key in the commits since the last successful deployment.
+
+## Editing the site without code (Pages CMS)
+
+The site's wording, colours and built-in ad are kept in simple files that [Pages CMS](https://pagescms.org) shows as forms:
+
+| In Pages CMS | File | What you can change |
+|---|---|---|
+| **Site settings** | `frontend/_data/settings.yml` | Site name, tagline, footer text, built-in sidebar banner |
+| **Homepage text** | `frontend/_data/homepage.yml` | Headings, placeholders and hints on the Notes page |
+| **Colours** | `frontend/_data/theme.yml` | Main and second colour, text, backgrounds, borders, corner roundness |
+| **About page** | `frontend/about.md` | Title and Markdown content |
+
+To edit: go to [app.pagescms.org](https://app.pagescms.org), sign in with GitHub, open this repo, change a field and click **Save**. Saving commits to `main`, so CI runs and Render redeploys the site in a few minutes. The forms are defined in `.pages.yml`; colour fields only accept 6-digit hex codes, so a typo can't break the styles.
+
+Live switches (banner notice, sidebar ad, rollouts) stay in Cloudflare Flagship, since they change instantly without a deploy.

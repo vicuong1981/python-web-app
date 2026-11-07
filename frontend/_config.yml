@@ -1,8 +1,8 @@
 # Jekyll site for the My Notes Application frontend.
 # Built to frontend/_site and served by FastAPI (see app/main.py).
-title: My Notes Application
-description: Capture notes, organise them with tags and categories, and share them by email.
-version: 0.4.0
+# Editable content (title, text, colours, built-in ad) lives in _data/ and is
+# edited through Pages CMS (see /.pages.yml).
+version: 0.5.0
 
 nav:
   - title: Notes
@@ -12,12 +12,6 @@ nav:
   - title: API docs
     url: /docs
 
-# Built-in banner shown in the right-hand ad slot when the sidebar-ad flag is "house"
-house_ad:
-  title: Enjoying My Notes?
-  text: This app is open source. See how it's built, or use it as a starting point for your own.
-  cta: View on GitHub
-  url: https://github.com/vicuong1981/python-web-app
 
 sass:
   style: compressed

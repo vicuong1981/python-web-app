@@ -91,6 +91,9 @@ jobs:
           done
           echo; echo "Checking the Jekyll frontend is served..."
           curl -fs http://localhost:8000/ | grep -q 'id="note-form"'
+          # Editable text from frontend/_data/settings.yml made it into the page
+          title=$(python3 -c "import yaml;print(yaml.safe_load(open('frontend/_data/settings.yml'))['title'])")
+          curl -fs http://localhost:8000/ | grep -qF "$title"
           curl -fs http://localhost:8000/about/ | grep -q 'About this app'
           curl -fs http://localhost:8000/assets/css/main.css | grep -q 'hero'
           curl -fs http://localhost:8000/assets/js/app.js | grep -q '/api/notes'
