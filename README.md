@@ -167,3 +167,21 @@ The site's wording, colours and built-in ad are kept in simple files that [Pages
 To edit: go to [app.pagescms.org](https://app.pagescms.org), sign in with GitHub, open this repo, change a field and click **Save**. Saving commits to `main`, so CI runs and Render redeploys the site in a few minutes. The forms are defined in `.pages.yml`; colour fields only accept 6-digit hex codes, so a typo can't break the styles.
 
 Live switches (banner notice, sidebar ad, rollouts) stay in Cloudflare Flagship, since they change instantly without a deploy.
+
+## Guardrails
+
+Two layers check every pull request into `main`.
+
+**Jira ticket check** (`.github/workflows/jira-check.yml`, runs now): fails unless the PR title, branch name or description contains a key from `KAN` or `SAM1` (e.g. `KAN-12: Add login` or branch `KAN-12-add-login`). With the `JIRA_EMAIL` and `JIRA_API_TOKEN` repository secrets set, it also asks Jira that the item exists and shows its summary and status. Without them it only checks the key's format. Change the projects with a `JIRA_PROJECTS` repository variable.
+
+**gitStream guardrails** (`.cm/gitstream.cm`, once gitStream runs on this repo): each one requests changes until fixed, and each has a label to override it on purpose.
+
+| Guardrail | Triggers when | Override label |
+|---|---|---|
+| Jira key | No `KAN-`/`SAM1-` key in title, branch or description (also comments a link to the item) | none |
+| Missing tests | `app/` changed but nothing in `tests/` | `tests-not-needed` |
+| Delivery files | Workflows, `.cm/`, `.jira/`, `Dockerfile`, `docker-compose.yml`, `render.yaml` or `.pages.yml` changed | `deploy-reviewed` |
+| Large PR | Estimated review time over 30 minutes | `large-pr-ok` |
+| Possible secret | An added line looks like a key, token, password or DSN | `not-a-secret` |
+
+To make these block merging, require the **Jira ticket linked** and **gitStream** checks on `main` with a GitHub ruleset, letting Pages CMS bypass it so content edits still save directly.

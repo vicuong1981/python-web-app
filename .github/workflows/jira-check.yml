@@ -1,0 +1,37 @@
+name: Jira ticket
+
+# Fails a pull request that isn't linked to a real Jira work item.
+# Re-runs when the title or description is edited, so fixing the title clears it.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  jira:
+    name: Jira ticket linked
+    # Skip bot PRs (e.g. Dependabot) and drafts
+    if: github.event.pull_request.user.type != 'Bot' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check for a Jira work item
+        env:
+          # Passed as environment variables, never pasted into the script,
+          # so a PR title can't inject shell commands.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          JIRA_PROJECTS: ${{ vars.JIRA_PROJECTS || 'KAN,SAM1' }}
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL || 'https://vicuong.atlassian.net' }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: python scripts/check_jira.py
