@@ -127,7 +127,15 @@ def test_linearb_payloads_for_a_pull_request():
         "pr_url": env["PR_URL"],
         "commit_sha": "abc123",
     }
-    assert first["tags"] == {"branch": "feature/x", "event": "pull_request"}
+    assert first["tags"] == {"branch": "feature/x", "event": "pull_request", "commit": "abc123"}
+
+
+def test_push_metrics_keep_commit_out_of_entity():
+    """LinearB rejects commit_sha without pr_url (HTTP 422), so pushes tag it instead."""
+    env = {"GITHUB_REPOSITORY": "o/r", "COMMIT_SHA": "abc123", "BRANCH": "main"}
+    p = sm.linearb_payloads({"high": 0, "medium": 0, "low": 0, "total": 0}, None, env)[0]
+    assert p["entity"] == {"repo_url": "https://github.com/o/r"}
+    assert p["tags"] == {"branch": "main", "event": "push", "commit": "abc123"}
 
 
 def test_posts_metrics_with_api_key():

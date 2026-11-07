@@ -165,11 +165,13 @@ def linearb_payloads(bandit: dict | None, sonar: dict | None, env: dict, now=Non
     entity = {"repo_url": repo_url}
     if env.get("PR_URL"):
         entity["pr_url"] = env["PR_URL"]
-    if env.get("COMMIT_SHA"):
+    # LinearB only accepts commit_sha alongside pr_url; on pushes it goes in tags.
+    if env.get("COMMIT_SHA") and env.get("PR_URL"):
         entity["commit_sha"] = env["COMMIT_SHA"]
     tags = {
         "branch": env.get("BRANCH", ""),
         "event": "pull_request" if env.get("PR_NUMBER") else "push",
+        "commit": env.get("COMMIT_SHA", ""),
     }
 
     def metric(name: str, value: float, source: str) -> dict:
