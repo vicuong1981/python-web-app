@@ -65,7 +65,7 @@ content:
     path: frontend/_data/theme.yml
     format: yaml
     fields:
-      - { name: accent, label: Main colour (buttons, links), type: string, required: true, pattern: { regex: "^#[0-9a-fA-F]{6}$", message: "Use a 6-digit hex code like #4f46e5" } }
+      - { name: accent, label: "Main colour (buttons, links)", type: string, required: true, pattern: { regex: "^#[0-9a-fA-F]{6}$", message: "Use a 6-digit hex code like #4f46e5" } }
       - { name: accent_2, label: Second colour (banner gradient), type: string, required: true, pattern: { regex: "^#[0-9a-fA-F]{6}$", message: "Use a 6-digit hex code like #06b6d4" } }
       - { name: text, label: Text colour, type: string, required: true, pattern: { regex: "^#[0-9a-fA-F]{6}$", message: "Use a 6-digit hex code" } }
       - { name: muted, label: Secondary text colour, type: string, required: true, pattern: { regex: "^#[0-9a-fA-F]{6}$", message: "Use a 6-digit hex code" } }
