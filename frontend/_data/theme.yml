@@ -1,0 +1,9 @@
+# Colours. Edit in Pages CMS ("Colours") or here. Use 6-digit hex codes like #4f46e5.
+accent: "#4f46e5"
+accent_2: "#06b6d4"
+text: "#1f2933"
+muted: "#627d98"
+background: "#f7f9fc"
+card: "#ffffff"
+border: "#d9e2ec"
+corner_radius: 10

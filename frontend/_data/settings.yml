@@ -1,0 +1,9 @@
+# Site-wide settings. Edit in Pages CMS ("Site settings") or here.
+title: My Notes Application
+description: Capture notes, organise them with tags and categories, and share them by email.
+footer_text: Built with Jekyll, served by FastAPI
+house_ad:
+  title: Enjoying My Notes?
+  text: This app is open source. See how it's built, or use it as a starting point for your own.
+  cta: View on GitHub
+  url: https://github.com/vicuong1981/python-web-app

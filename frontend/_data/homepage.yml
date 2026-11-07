@@ -1,0 +1,10 @@
+# Text on the Notes page. Edit in Pages CMS ("Homepage text") or here.
+hero_title: Welcome to the new My Notes Application ✨
+hero_text: You're seeing the redesigned homepage, switched on by a Cloudflare Flagship feature flag.
+add_note_heading: Add a note
+note_placeholder: Write something…
+tags_hint: Separate tags with commas.
+categories_heading: Categories
+notes_heading: Your notes
+empty_notes: No notes yet.
+share_hint: Opens your email app with the notes filled in, so you can check it before sending.

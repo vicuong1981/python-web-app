@@ -1,5 +1,15 @@
 ---
-# Front matter tells Jekyll to compile this file with Sass.
+# Front matter makes Jekyll run Liquid (for the colours below) and then Sass.
 ---
+{% assign t = site.data.theme %}
+$accent: {{ t.accent | default: "#4f46e5" }};
+$accent-2: {{ t.accent_2 | default: "#06b6d4" }};
+$text: {{ t.text | default: "#1f2933" }};
+$muted: {{ t.muted | default: "#627d98" }};
+$bg: {{ t.background | default: "#f7f9fc" }};
+$card: {{ t.card | default: "#ffffff" }};
+$border: {{ t.border | default: "#d9e2ec" }};
+$radius: {{ t.corner_radius | default: 10 }}px;
+
 @import "variables";
 @import "base";
