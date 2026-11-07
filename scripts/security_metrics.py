@@ -209,7 +209,8 @@ def post_linearb(payloads: list[dict], api_key: str, opener=urllib.request.urlop
             with opener(req, timeout=20) as resp:
                 results.append(f"{p['metric_name']}={p['value']}: HTTP {resp.status}")
         except urllib.error.HTTPError as e:
-            results.append(f"{p['metric_name']}: HTTP {e.code}")
+            detail = e.read().decode("utf-8", "replace")[:300] if e.fp else ""
+            results.append(f"{p['metric_name']}: HTTP {e.code} {detail}".rstrip())
         except (urllib.error.URLError, TimeoutError) as e:
             results.append(f"{p['metric_name']}: failed ({e})")
     return results
