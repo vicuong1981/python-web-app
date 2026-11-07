@@ -1,0 +1,125 @@
+name: Security
+
+# Bandit (Python security linter) and SonarQube Cloud (code quality and
+# security). Results go to the GitHub Security tab, a PR comment that gitStream
+# reads, and LinearB's External Custom Metrics API.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bandit:
+    name: Bandit security scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "bandit[sarif,toml]==1.8.6"
+
+      - name: Scan app and scripts
+        run: |
+          bandit -r app scripts -f json -o bandit-report.json --exit-zero
+          bandit -r app scripts -f sarif -o bandit.sarif --exit-zero
+
+      - name: Show findings in the GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: bandit.sarif
+          category: bandit
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 7
+
+      - name: Fail on medium or high severity findings
+        run: bandit -r app scripts --severity-level medium --confidence-level medium
+
+  sonarqube:
+    name: SonarQube Cloud
+    needs: bandit
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Check SonarQube Cloud is set up
+        if: env.SONAR_TOKEN == ''
+        run: echo "::notice::SONAR_TOKEN secret not set - skipping SonarQube Cloud. See README > Security scans."
+
+      - uses: actions/checkout@v4
+        if: env.SONAR_TOKEN != ''
+        with:
+          fetch-depth: 0   # full history for accurate "new code" and blame
+      - uses: actions/setup-python@v5
+        if: env.SONAR_TOKEN != ''
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Run tests with coverage
+        if: env.SONAR_TOKEN != ''
+        run: |
+          pip install -r requirements-dev.txt
+          pytest -q --cov=app --cov=scripts --cov-report=xml
+      - uses: actions/download-artifact@v4
+        if: env.SONAR_TOKEN != ''
+        continue-on-error: true
+        with:
+          name: bandit-report
+
+      - name: SonarQube Cloud scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+        # The quality gate result is reported, not enforced, until you make it a required check
+        continue-on-error: true
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION || 'vicuong1981' }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || 'vicuong1981_python-web-app' }}
+            -Dsonar.qualitygate.wait=true
+
+  report:
+    name: Report to PR, gitStream and LinearB
+    needs: [bandit, sonarqube]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: bandit-report
+      - name: Comment on the PR and send LinearB custom metrics
+        env:
+          BANDIT_REPORT: bandit-report.json
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'vicuong1981_python-web-app' }}
+          LINEARB_API_TOKEN: ${{ secrets.LINEARB_API_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: python scripts/security_metrics.py
